@@ -1,5 +1,25 @@
 # CarND-Path-Planning-Project
 Self-Driving Car Engineer Nanodegree Program
+
+### Reflection
+At first I just tried to get the car going and set the distance to 0.4m per 0.2sec.
+Now the car was going in a straight line.
+Then I used Frenet coordinate transformations to follow the lane. One lane is 4m wide and I wanted to drive in the middle one which resulted in d=6.
+Here you can see the highway map waypoints are widely spaced. When driving them linearly the ride is very jagged due to sharp corners.
+The next step was to use spline.h interoplation to smoothen the driving path. Here I took only three widely spaced Frenet points which are 30m appart (s value). d is variable and used later on to change lanes. Interpolation with a spline made the planned path smooth and reduced pikes in acceleration and jerkvalues.
+After solving this problem I realized the car was accelerating from 0 to almost 50mph in 0.2sec. To reduce jerk and acceleration in the beginning I set the reference velocity to 50mph. Any difference to the reference velocity is adjusted by a acceleration of 5m/s².
+
+
+
+
+
+
+ the reference velocity was always incremented or decremented by some constant value that resulted in plus or minus 5 m/s^2 [main.cpp at line 456] . Inorder for the ego vehicle to travel at the reference velocity the spline needed to be split into evenly spaced points, where the car would transverse to each point every .02 seconds. To do this the three anchor points where converted to the local vehicle coordinate space where the math was easier to use, and then spline could be linearly approximated with its distance and then the number of spaces could be calculated [main.cpp at line 464]. 
+
+If there wasnt any cars in front of the ego vehicle then the reference speed was 49.5 MPH, chosen so it was just slightly under the speed limit, otherwise the car would start slowing down and also try to see if it can change lanes. The sensor fusion data allowed the ego vehicle to see all the other traffic cars on the road, each traffic car's Frenet values were used to see if it was in the same lane as the car and then how close it was to the ego vehicle [main.cpp at line 324]. This logic using Frenet values was used both for detecting traffic car infront of the ego vehicle as well as seeing if a lane change was safe. If a lane change was safe the ego vehicle simply would change its lane and the spline interoplation would make the lane change smooth [main.cpp at line 342 and line 372]. 
+
+The lane change logic was quite simple, if there was a car in front of the ego vehicle then it would see if it was safe to change to the left lane, if the left lane was not safe then it would try to change to the right lane. Some improvements could be made to this lane change algorithm by projecting further ahead and using a cost function to see if it really resulted in increased speed. Currently the car was able to go 4.32 miles around the highway without any incidents in 5:36. 
+ 
    
 ### Simulator.
 You can download the Term3 Simulator which contains the Path Planning Project from the [releases tab (https://github.com/udacity/self-driving-car-sim/releases).
@@ -134,7 +154,3 @@ that's just a guess.
 
 One last note here: regardless of the IDE used, every submitted project must
 still be compilable with cmake and make./
-
-## How to write a README
-A well written README file can enhance your project and portfolio.  Develop your abilities to create professional README files by completing [this free course](https://www.udacity.com/course/writing-readmes--ud777).
-
