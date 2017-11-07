@@ -6,13 +6,16 @@ Self-Driving Car Engineer Nanodegree Program
 
 At first, I just tried to get the car going and set a constant distance to 0.4m which will be driven every 0.2sec.
 Now the car was going in a straight line.
+
 ![](https://github.com/christianreiser/CarND-Path-Planning-Project/blob/master/gif/straightcropped.gif)
 
 Then I used Frenet coordinate transformations to follow the lane. One lane is 4m wide and I wanted to drive in the middle one which resulted in d=6.
 Here you can see the highway map waypoints are widely spaced. When driving them linearly the ride is very jagged due to sharp corners.
+
 ![](https://github.com/christianreiser/CarND-Path-Planning-Project/blob/master/gif/lane.gif)
 
 The next step was to use `spline.h` interpolation to smoothen the driving path. Here I took only three widely spaced Frenet points which are 30m apart (s value)[main.cpp at line 419](https://github.com/christianreiser/CarND-Path-Planning-Project/blob/master/src/main.cpp#L419). d is variable and used later on to change lanes. Interpolation with a spline made the planned path smooth and reduced pikes in acceleration and jerk values.[main.cpp at line 445](https://github.com/christianreiser/CarND-Path-Planning-Project/blob/master/src/main.cpp#L445)
+
 ![](https://github.com/christianreiser/CarND-Path-Planning-Project/blob/master/gif/spline.gif)
 
 After solving this problem I realized the car was accelerating from 0 to almost 50mph in 0.2sec. To reduce jerk and acceleration in the beginning I set the reference velocity to 50mph. Any difference in the reference velocity is adjusted by an acceleration of ±5m/s². [main.cpp at line 472](https://github.com/christianreiser/CarND-Path-Planning-Project/blob/master/src/main.cpp#L472)
@@ -20,9 +23,11 @@ The velocity when driving the planned spline path is linearly approximated and a
 Now the car was able to follow one lane without violating the acceleration or jerk limits. 
 
 However, the car is always driving at almost 50mph and would rear-end collide with slower cars. That's why I used the sensor fusion data to detect if a car is right in front of me. If so it would like to change lanes. [main.cpp at line 321](https://github.com/christianreiser/CarND-Path-Planning-Project/blob/master/src/main.cpp#L321) Changing to the left lane is always prioritized. It will change lanes if there is no close car on the left. Fortunately, the spline interpolation made lane changes smooth. If there is already a near car on the left the same is done for the right side. If it's unsafe to take either lane the car will slow down and go slightly slower than the car in front. [main.cpp at line 311](https://github.com/christianreiser/CarND-Path-Planning-Project/blob/master/src/main.cpp#L311)
+
 ![](https://github.com/christianreiser/CarND-Path-Planning-Project/blob/master/gif/unnecessarylanechange.gif)
 
 This version resulted in driving without any collisions or violating limits. The average speed also improved a lot. However, the car changed lanes, even if the other lane is not moving faster. This resulted in unnecessary lane changes. That's why implemented to change lanes only if there is no car for the next 35m of the desired lane. [main.cpp at line 342](https://github.com/christianreiser/CarND-Path-Planning-Project/blob/master/src/main.cpp#L342) 
+
 ![](https://github.com/christianreiser/CarND-Path-Planning-Project/blob/master/gif/final.gif)
 
 ### Simulator.
