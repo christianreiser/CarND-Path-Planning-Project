@@ -1,9 +1,3 @@
-/*
- * This project was inspired by and contains code from 
- * Udacity lessons, Quizzes, Project Walkthrough and Q&A (by David Silver and AAron Brown)
- * http://udacity.com/drive
- */
-
 #include <fstream>
 #include <math.h>
 #include <uWS/uWS.h>
